@@ -5,7 +5,11 @@
       "Bash(bd init:*)",
       "Bash(bd sync:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(bd ready:*)",
+      "Bash(bd doctor:*)",
+      "Bash(bd migrate:*)"
     ]
   }
 }
