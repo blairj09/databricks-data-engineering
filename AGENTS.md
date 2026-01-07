@@ -1,3 +1,21 @@
+# Databricks and Data Engineering with Positron
+This is a repository for a webinar highlighting how to use Positron as a tool for building Data Engineering pipelines in Databricks. The intented outcome is twofold:
+
+1. Demonstrate the capabilities of Positron (with an emphasis on AI features) as a tool to work alongside Databricks
+2. Highlight the benefits of a true IDE for Data Engineering in comparison to the widely accepted practice of using Notebooks as the primary tool for Data Engineering
+
+This project should provide a use case and code examples that provide a demonstration of the following:
+- Using Positron Assistant with Agent Skills to navigate Databricks specific tasks
+- Using Databricks Asset Bundels (DABs) to develop and deploy engineering pipelines
+- The Catalog Explorer in Positron, which is an exerimental feature that allows users to explore external data catalogs directly in the IDE
+
+This project should roughly follow a standard Data Engineering process:
+- Identify new data
+- Explore data structure and quality
+- Integrate data with existing data
+- Schedule recurring updates
+- Evaluate success of updates
+
 # Agent Instructions
 
 This project uses **bd** (beads) for issue tracking. Run `bd onboard` to get started.
