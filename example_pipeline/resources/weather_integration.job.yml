@@ -1,0 +1,60 @@
+# Job for weather data integration pipeline
+# This job orchestrates the weather data fetch and DLT pipeline refresh
+
+resources:
+  jobs:
+    weather_integration:
+      name: weather_integration
+
+      # Schedule: Run daily at 6 AM UTC (1 AM EST)
+      trigger:
+        periodic:
+          interval: 1
+          unit: DAYS
+
+      parameters:
+        - name: catalog
+          default: ${var.catalog}
+        - name: schema
+          default: ${var.schema}
+        - name: start_date
+          default: "2023-01-01"
+        - name: end_date
+          default: "2023-12-31"
+
+      tasks:
+        # Task 1: Fetch weather data from Open-Meteo API
+        - task_key: fetch_weather_data
+          description: "Fetch historical weather data from Open-Meteo API"
+          python_wheel_task:
+            package_name: example_pipeline
+            entry_point: fetch_weather
+            parameters:
+              - --catalog
+              - "{{job.parameters.catalog}}"
+              - --schema
+              - "{{job.parameters.schema}}"
+              - --start-date
+              - "{{job.parameters.start_date}}"
+              - --end-date
+              - "{{job.parameters.end_date}}"
+          libraries:
+            - whl: ../dist/*.whl
+          environment_key: default
+
+        # Task 2: Run the DLT pipeline to process weather + taxi data
+        - task_key: run_dlt_pipeline
+          depends_on:
+            - task_key: fetch_weather_data
+          description: "Run DLT pipeline to join weather with taxi data"
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.example_pipeline_etl.id}
+            full_refresh: false
+
+      environments:
+        - environment_key: default
+          spec:
+            client: "1"
+            dependencies:
+              - requests
+              - pandas

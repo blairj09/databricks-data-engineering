@@ -1,0 +1,317 @@
+---
+title: "Data Engineering with Positron + Databricks"
+subtitle: "Why Your IDE Matters for Production Pipelines"
+author: "Posit"
+format:
+  revealjs:
+    theme: [default, custom.scss]
+    slide-number: true
+    footer: "Posit | Data Engineering with Positron + Databricks"
+    logo: https://posit.co/wp-content/uploads/2022/10/Posit-logo-h-full-color-RGB-TM.svg
+    transition: fade
+    highlight-style: github
+    code-line-numbers: false
+---
+
+## Agenda {.smaller}
+
+1. **The Business Question** - Why we need weather data
+2. **Positron + Databricks Overview** - What makes this different
+3. **Live Demo** - Building a weather integration pipeline
+4. **IDE vs Notebooks** - When to use which
+5. **Q&A**
+
+::: {.notes}
+~45-50 minutes total. Demo is the core - about 30 minutes.
+:::
+
+# Act 1: The Problem {background-color="#447099"}
+
+## The Business Question
+
+> "How does weather impact NYC taxi operations?"
+
+- Do rainy days increase ridership?
+- Does extreme cold/heat affect fares?
+- Can we predict demand based on weather forecasts?
+
+::: {.notes}
+Set up the business context. This is a realistic analytics question that requires data integration.
+:::
+
+## Current State: Taxi Data in Databricks
+
+We already have NYC taxi trip data in Unity Catalog:
+
+- **samples.nyctaxi.trips** - Trip records with pickup/dropoff times, fares, locations
+- Millions of records
+- No weather context
+
+::: {.fragment}
+**The gap**: We can see *what* happened, but not *why*.
+:::
+
+::: {.notes}
+Show Catalog Explorer here if time permits - browse the existing taxi data.
+:::
+
+## What We Need
+
+Integrate **historical weather data** with taxi trips:
+
+- Temperature, precipitation, wind speed
+- Hourly granularity to match trip timestamps
+- Join on date/time to enable weather-based analysis
+
+::: {.fragment}
+Let's build this pipeline - the Data Engineering way.
+:::
+
+# Act 2: Positron + Databricks {background-color="#447099"}
+
+## What is Positron?
+
+A next-generation IDE from Posit (makers of RStudio)
+
+- Built on VS Code (familiar interface)
+- Designed for **data work** - R, Python, and more
+- Native support for Databricks workflows
+
+::: {.columns}
+::: {.column width="50%"}
+**Key Features**
+
+- AI Assistant
+- Catalog Explorer
+- DAB Integration
+- Data Viewer
+:::
+
+::: {.column width="50%"}
+**Why It Matters**
+
+- Professional tooling
+- Version control native
+- Testable code
+- Team collaboration
+:::
+:::
+
+## Why IDE > Notebooks for Data Engineering
+
+::: {.incremental}
+- **Version Control**: Real git diffs, not JSON blobs
+- **Testing**: pytest works out of the box
+- **Modularity**: Import functions across files
+- **Code Review**: PRs that humans can read
+- **Debugging**: Breakpoints, not print statements
+:::
+
+::: {.notes}
+These are pain points DE teams feel daily. Acknowledge that notebooks have their place - but not for production pipelines.
+:::
+
+# Act 3: Live Demo {background-color="#447099"}
+
+## Demo: Building a Weather Pipeline
+
+We'll walk through the full Data Engineering workflow:
+
+1. **Identify** new data (Open-Meteo API)
+2. **Explore** data structure and quality
+3. **Integrate** with existing taxi data
+4. **Debug** a failure (yes, really)
+5. **Deploy** with Databricks Asset Bundles
+
+::: {.notes}
+Switch to Positron for the demo. Keep slides minimal from here - the screen should show the IDE.
+:::
+
+## Stage 1: Identify New Data
+
+**Goal**: Find weather data for NYC
+
+- Use AI to explore the Open-Meteo API
+- Browse existing taxi data in Catalog Explorer
+
+::: {.notes}
+LIVE CODING: Ask Positron Assistant about Open-Meteo API.
+Talking point: "In notebooks, you'd switch tabs to read docs. Here, AI brings the docs to you."
+:::
+
+## Stage 2: Explore Data Quality
+
+**Goal**: Understand the weather data
+
+- Fetch sample data with AI-generated code
+- Profile the data interactively
+- Check for nulls, ranges, anomalies
+
+::: {.notes}
+LIVE CODING: Ask AI to fetch January 2023 weather for NYC.
+Talking point: "Notice we're in a regular Python file, not a notebook. We can still explore interactively."
+:::
+
+## Stage 3: Integrate Data
+
+**Goal**: Build the ETL pipeline
+
+- Create DLT transformations
+- Add data quality expectations
+- Run tests locally with Databricks Connect
+
+::: {.notes}
+LIVE CODING: Ask AI to create a DLT table joining weather and taxi data.
+Show DLT expectations: @dlt.expect_or_fail for data quality.
+Talking point: "This is testable, reviewable code."
+:::
+
+## Stage 3.5: Debugging a Failure
+
+**Goal**: Show IDE debugging advantages
+
+- A transformation fails (timezone bug)
+- View the error in Databricks
+- Debug with breakpoints in Positron
+
+::: {.notes}
+Show the pre-staged failure. Set breakpoint, step through.
+Talking point: "In notebooks, you'd be adding print statements. Here, you debug like a real developer."
+:::
+
+## Stage 4: Deploy with DABs
+
+**Goal**: Deploy to Databricks
+
+- Walk through `databricks.yml`
+- Run `databricks bundle validate`
+- Deploy to dev environment
+
+::: {.notes}
+Show the YAML configuration. Run validation and deploy.
+Talking point: "Infrastructure as code. Version controlled, repeatable deployments."
+:::
+
+## Stage 5: Verify Success
+
+**Goal**: Confirm the pipeline works
+
+- View job run in Databricks UI
+- Query integrated data via Catalog Explorer
+
+::: {.notes}
+Talking point: "The full loop: develop locally, deploy to cloud, verify results."
+:::
+
+# Act 4: IDE vs Notebooks {background-color="#447099"}
+
+## The Pain Points Table {.smaller}
+
+| Notebook Pain Point | IDE Solution |
+|---------------------|--------------|
+| "It works on my cluster" syndrome | Local testing with Databricks Connect |
+| Meaningless git diffs | Standard Python files, clean diffs |
+| Copy-paste code between notebooks | Proper imports and shared modules |
+| No code review possible | PR-based workflows with real diffs |
+| Can't unit test transformations | pytest with mocked Spark |
+| Production debugging = read logs | Breakpoints, stack traces, debugger |
+| Hidden state from cell execution order | Stateless functions, explicit dependencies |
+
+## Code Review: Notebook vs Python
+
+::: {.columns}
+::: {.column width="50%"}
+**Notebook PR Diff**
+
+```json
+{
+  "cells": [
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# 500 lines of JSON..."
+      ]
+    }
+  ]
+}
+```
+
+*Can you review this?*
+:::
+
+::: {.column width="50%"}
+**Python File Diff**
+
+```diff
+- def join_weather(trips_df):
++ def join_weather(trips_df, weather_df):
+      return trips_df.join(
+-         spark.table("weather"),
++         weather_df,
+          on="pickup_date"
+      )
+```
+
+*Clear, reviewable changes*
+:::
+:::
+
+## CI/CD Integration
+
+The same tests run everywhere:
+
+```bash
+# Local development
+pytest tests/
+
+# GitHub Actions (on every PR)
+pytest tests/
+
+# Pre-deployment validation
+databricks bundle validate && pytest tests/
+```
+
+::: {.fragment}
+**One codebase. One test suite. Multiple environments.**
+:::
+
+## When Notebooks ARE Right
+
+Notebooks aren't evil - they have their place:
+
+::: {.incremental}
+- **Exploration**: Ad-hoc data analysis
+- **Prototyping**: Quick experiments
+- **Sharing**: Results with stakeholders
+- **Teaching**: Interactive tutorials
+:::
+
+::: {.fragment}
+**The key**: Production pipelines deserve production tooling.
+:::
+
+## Key Takeaways
+
+::: {.incremental}
+1. **Positron** brings professional IDE features to data work
+2. **Databricks Asset Bundles** enable infrastructure as code
+3. **Delta Live Tables** simplify pipeline development
+4. **IDE workflows** improve reliability, testing, and collaboration
+5. **Use the right tool** - notebooks for exploration, IDE for production
+:::
+
+# Questions? {background-color="#447099"}
+
+## Resources
+
+- **This repo**: [github.com/posit/databricks-data-engineering](https://github.com/posit/databricks-data-engineering)
+- **Positron**: [positron.posit.co](https://positron.posit.co)
+- **Databricks Asset Bundles**: [docs.databricks.com/dev-tools/bundles](https://docs.databricks.com/dev-tools/bundles)
+- **Delta Live Tables**: [docs.databricks.com/delta-live-tables](https://docs.databricks.com/delta-live-tables)
+
+::: {.notes}
+Thank you! Questions?
+:::

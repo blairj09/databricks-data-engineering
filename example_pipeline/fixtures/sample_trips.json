@@ -1,0 +1,66 @@
+[
+  {
+    "pickup_datetime": "2023-01-15T08:15:00",
+    "dropoff_datetime": "2023-01-15T08:32:00",
+    "pickup_zip": "10001",
+    "dropoff_zip": "10016",
+    "trip_distance": 2.5,
+    "fare_amount": 15.50
+  },
+  {
+    "pickup_datetime": "2023-01-15T09:05:00",
+    "dropoff_datetime": "2023-01-15T09:28:00",
+    "pickup_zip": "10003",
+    "dropoff_zip": "10019",
+    "trip_distance": 3.2,
+    "fare_amount": 22.00
+  },
+  {
+    "pickup_datetime": "2023-01-15T09:45:00",
+    "dropoff_datetime": "2023-01-15T10:05:00",
+    "pickup_zip": "10012",
+    "dropoff_zip": "10007",
+    "trip_distance": 1.8,
+    "fare_amount": 12.75
+  },
+  {
+    "pickup_datetime": "2023-01-15T10:30:00",
+    "dropoff_datetime": "2023-01-15T10:55:00",
+    "pickup_zip": "10022",
+    "dropoff_zip": "10036",
+    "trip_distance": 1.5,
+    "fare_amount": 11.00
+  },
+  {
+    "pickup_datetime": "2023-02-20T14:15:00",
+    "dropoff_datetime": "2023-02-20T14:45:00",
+    "pickup_zip": "10001",
+    "dropoff_zip": "10028",
+    "trip_distance": 4.1,
+    "fare_amount": 28.50
+  },
+  {
+    "pickup_datetime": "2023-02-20T14:30:00",
+    "dropoff_datetime": "2023-02-20T15:00:00",
+    "pickup_zip": "10014",
+    "dropoff_zip": "10038",
+    "trip_distance": 3.8,
+    "fare_amount": 25.75
+  },
+  {
+    "pickup_datetime": "2023-07-04T12:00:00",
+    "dropoff_datetime": "2023-07-04T12:25:00",
+    "pickup_zip": "10019",
+    "dropoff_zip": "10001",
+    "trip_distance": 2.2,
+    "fare_amount": 16.25
+  },
+  {
+    "pickup_datetime": "2023-07-04T12:30:00",
+    "dropoff_datetime": "2023-07-04T12:50:00",
+    "pickup_zip": "10003",
+    "dropoff_zip": "10011",
+    "trip_distance": 1.1,
+    "fare_amount": 9.50
+  }
+]

@@ -1,0 +1,29 @@
+/*-- scss:defaults --*/
+
+// Posit brand colors
+$link-color: #447099;
+$code-block-bg: #f8f9fa;
+
+/*-- scss:rules --*/
+
+// Make code blocks more readable
+.reveal pre code {
+  max-height: 500px;
+  font-size: 0.8em;
+}
+
+// Style the pain points table
+.reveal table {
+  font-size: 0.75em;
+}
+
+// Fragment styling
+.reveal .fragment.highlight-current-blue.current-fragment {
+  color: #447099;
+}
+
+// Notes styling (for presenter view)
+.reveal .speaker-notes {
+  font-size: 1.2em;
+  line-height: 1.4;
+}
