@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(beads:init)",
+      "Bash(bd init:*)",
+      "Bash(bd sync:*)",
+      "Bash(git add:*)"
+    ]
+  }
+}
