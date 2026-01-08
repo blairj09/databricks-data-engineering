@@ -25,6 +25,7 @@ targets:
     default: true
     workspace:
       host: https://adb-3256282566390055.15.azuredatabricks.net
+    cluster_id: 0108-163958-hk71064g  # DBR 17.3 LTS
     variables:
       catalog: hive_metastore
       schema: ${workspace.current_user.short_name}
