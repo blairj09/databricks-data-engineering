@@ -26,21 +26,13 @@ resources:
         # Task 1: Fetch weather data from Open-Meteo API
         - task_key: fetch_weather_data
           description: "Fetch historical weather data from Open-Meteo API"
-          python_wheel_task:
-            package_name: example_pipeline
-            entry_point: fetch_weather
-            parameters:
-              - --catalog
-              - "{{job.parameters.catalog}}"
-              - --schema
-              - "{{job.parameters.schema}}"
-              - --start-date
-              - "{{job.parameters.start_date}}"
-              - --end-date
-              - "{{job.parameters.end_date}}"
-          libraries:
-            - whl: ../dist/*.whl
-          environment_key: default
+          notebook_task:
+            notebook_path: ../src/fetch_weather_notebook.ipynb
+            base_parameters:
+              catalog: "{{job.parameters.catalog}}"
+              schema: "{{job.parameters.schema}}"
+              start_date: "{{job.parameters.start_date}}"
+              end_date: "{{job.parameters.end_date}}"
 
         # Task 2: Run the DLT pipeline to process weather + taxi data
         - task_key: run_dlt_pipeline
@@ -55,6 +47,3 @@ resources:
         - environment_key: default
           spec:
             client: "1"
-            dependencies:
-              - requests
-              - pandas

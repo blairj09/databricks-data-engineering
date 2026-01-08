@@ -4,18 +4,13 @@ resources:
   pipelines:
     example_pipeline_etl:
       name: example_pipeline_etl
-      # Catalog is required for serverless compute
-      catalog: main
-      schema: ${var.schema}
-      serverless: true
+      target: ${var.schema}
       root_path: "../src/example_pipeline_etl"
 
       libraries:
         - glob:
             include: ../src/example_pipeline_etl/transformations/**
 
-      environment:
-        dependencies:
-          # We include every dependency defined by pyproject.toml by defining an editable environment
-          # that points to the folder where pyproject.toml is deployed.
-          - --editable ${workspace.file_path}
+      clusters:
+        - label: default
+          num_workers: 1
