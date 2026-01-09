@@ -1,0 +1,215 @@
+---
+title: "Weather Impact on NYC Taxi Operations"
+subtitle: "Local Exploration & Proof of Concept"
+format:
+  html:
+    code-fold: false
+    toc: true
+execute:
+  eval: false
+---
+
+## Overview
+
+**Business Question**: How does weather impact NYC taxi ridership and fares?
+
+This notebook explores integrating weather data with taxi trip data to answer this question. Once we've validated the approach locally, we'll productionize it as a DLT pipeline in Databricks.
+
+## Setup
+
+```{python}
+import pandas as pd
+import requests
+from datetime import datetime, timedelta
+from databricks.connect import DatabricksSession
+
+# Connect to Databricks (for sampling taxi data)
+spark = DatabricksSession.builder.getOrCreate()
+```
+
+## Step 1: Explore the Weather Data Source
+
+We'll use the [Open-Meteo Historical Weather API](https://open-meteo.com/) - it's free, no API key required, and has hourly data back to 1940.
+
+### Fetch Sample Weather Data
+
+```{python}
+# NYC coordinates
+NYC_LAT, NYC_LON = 40.7128, -74.0060
+
+# Fetch one month of weather data
+params = {
+    "latitude": NYC_LAT,
+    "longitude": NYC_LON,
+    "start_date": "2023-06-01",
+    "end_date": "2023-06-30",
+    "hourly": "temperature_2m,precipitation,rain,snowfall,wind_speed_10m,weather_code",
+    "timezone": "America/New_York",
+}
+
+response = requests.get("https://archive-api.open-meteo.com/v1/archive", params=params)
+weather_json = response.json()
+```
+
+### Parse into DataFrame
+
+```{python}
+weather_df = pd.DataFrame({
+    "datetime": pd.to_datetime(weather_json["hourly"]["time"]),
+    "temperature_c": weather_json["hourly"]["temperature_2m"],
+    "precipitation_mm": weather_json["hourly"]["precipitation"],
+    "rain_mm": weather_json["hourly"]["rain"],
+    "wind_speed_kmh": weather_json["hourly"]["wind_speed_10m"],
+    "weather_code": weather_json["hourly"]["weather_code"],
+})
+
+# Add derived columns for joining
+weather_df["date"] = weather_df["datetime"].dt.date
+weather_df["hour"] = weather_df["datetime"].dt.hour
+
+# Categorize weather conditions
+def categorize_weather(code):
+    if code == 0: return "Clear"
+    if code in [1, 2, 3]: return "Partly Cloudy"
+    if code in [61, 63, 65, 80, 81, 82]: return "Rain"
+    if code in [71, 73, 75, 85, 86]: return "Snow"
+    if code in [95, 96, 99]: return "Thunderstorm"
+    return "Other"
+
+weather_df["weather_category"] = weather_df["weather_code"].apply(categorize_weather)
+
+weather_df.head(10)
+```
+
+### Profile the Weather Data
+
+```{python}
+print(f"Records: {len(weather_df)}")
+print(f"Date range: {weather_df['date'].min()} to {weather_df['date'].max()}")
+print(f"\nTemperature range: {weather_df['temperature_c'].min():.1f}°C to {weather_df['temperature_c'].max():.1f}°C")
+print(f"\nWeather distribution:")
+print(weather_df["weather_category"].value_counts())
+```
+
+## Step 2: Sample NYC Taxi Data from Databricks
+
+Pull a sample of taxi trips for the same time period using Databricks Connect.
+
+```{python}
+# Sample taxi trips from Databricks (runs remotely, returns locally)
+taxi_sample = spark.sql("""
+    SELECT
+        pickup_datetime,
+        dropoff_datetime,
+        pickup_zip,
+        dropoff_zip,
+        trip_distance,
+        fare_amount
+    FROM samples.nyctaxi.trips
+    WHERE pickup_datetime BETWEEN '2023-06-01' AND '2023-06-30'
+    LIMIT 10000
+""").toPandas()
+
+print(f"Sampled {len(taxi_sample)} taxi trips")
+taxi_sample.head()
+```
+
+### Prepare Taxi Data for Join
+
+```{python}
+# Extract date and hour from pickup time for joining
+taxi_sample["pickup_date"] = pd.to_datetime(taxi_sample["pickup_datetime"]).dt.date
+taxi_sample["pickup_hour"] = pd.to_datetime(taxi_sample["pickup_datetime"]).dt.hour
+
+taxi_sample.head()
+```
+
+## Step 3: Join Weather with Taxi Trips (Proof of Concept)
+
+Join on date + hour to enrich trips with weather conditions at pickup time.
+
+```{python}
+# Join taxi trips with weather on date + hour
+taxi_weather = taxi_sample.merge(
+    weather_df[["date", "hour", "temperature_c", "precipitation_mm", "weather_category"]],
+    left_on=["pickup_date", "pickup_hour"],
+    right_on=["date", "hour"],
+    how="left"
+)
+
+print(f"Joined records: {len(taxi_weather)}")
+print(f"Records with weather data: {taxi_weather['temperature_c'].notna().sum()}")
+
+taxi_weather.head()
+```
+
+## Step 4: Analyze Weather Impact
+
+Now we can answer our business question!
+
+### Average Fare by Weather Condition
+
+```{python}
+weather_impact = taxi_weather.groupby("weather_category").agg({
+    "fare_amount": ["mean", "count"],
+    "trip_distance": "mean",
+    "temperature_c": "mean"
+}).round(2)
+
+weather_impact.columns = ["avg_fare", "trip_count", "avg_distance", "avg_temp"]
+weather_impact = weather_impact.sort_values("trip_count", ascending=False)
+
+print("Impact of Weather on Taxi Operations:")
+print(weather_impact)
+```
+
+### Observations
+
+```{python}
+# Quick insights
+clear_fare = taxi_weather[taxi_weather["weather_category"] == "Clear"]["fare_amount"].mean()
+rain_fare = taxi_weather[taxi_weather["weather_category"] == "Rain"]["fare_amount"].mean()
+
+print(f"\nKey Findings:")
+print(f"  - Average fare on clear days: ${clear_fare:.2f}")
+print(f"  - Average fare on rainy days: ${rain_fare:.2f}")
+print(f"  - Difference: ${rain_fare - clear_fare:.2f} ({((rain_fare/clear_fare)-1)*100:.1f}%)")
+```
+
+## Step 5: Conclusions & Next Steps
+
+### What We Learned
+
+1. Weather data from Open-Meteo joins cleanly with taxi data on date/hour
+2. Weather conditions do appear to impact fares and trip patterns
+3. The join logic works - ready to productionize
+
+### Productionization Requirements
+
+To turn this into a production pipeline, we need:
+
+1. **Weather ingestion**: Fetch historical + ongoing weather data
+2. **Bronze table**: Raw weather data (`weather_raw`)
+3. **Silver table**: Taxi trips enriched with weather (`taxi_weather_joined`)
+4. **Gold tables**: Aggregated metrics for analysis
+   - `weather_impact_summary` - metrics by weather category
+   - `hourly_weather_metrics` - time-series analysis
+   - `temperature_band_analysis` - metrics by temperature range
+
+### Data Quality Expectations
+
+- `pickup_datetime` must not be null
+- `fare_amount` must be >= 0
+- `temperature_c` should be between -50 and 50
+- Join should produce weather data for most trips (warn if < 90% match)
+
+---
+
+**Next Step**: Ask Positron Assistant to help create a DLT pipeline based on this exploration.
+
+Example prompt:
+> "Based on this exploration notebook, help me create a DLT pipeline that:
+> 1. Ingests weather data into a bronze table
+> 2. Joins it with taxi trips in a silver table
+> 3. Creates gold aggregation tables for analysis
+> Include data quality expectations."

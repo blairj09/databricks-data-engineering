@@ -7,4 +7,5 @@ __pycache__/
 scratch/**
 !scratch/README.md
 **/explorations/**
-**/!explorations/README.md
+!**/explorations/README.md
+!**/explorations/weather_impact_exploration.qmd
