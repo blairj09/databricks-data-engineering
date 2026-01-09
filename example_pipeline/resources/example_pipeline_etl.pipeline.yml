@@ -4,13 +4,11 @@ resources:
   pipelines:
     example_pipeline_etl:
       name: example_pipeline_etl
-      target: ${var.schema}
+      catalog: ${var.catalog}
+      schema: ${var.schema}
+      serverless: true
       root_path: "../src/example_pipeline_etl"
 
       libraries:
         - glob:
             include: ../src/example_pipeline_etl/transformations/**
-
-      clusters:
-        - label: default
-          num_workers: 1
