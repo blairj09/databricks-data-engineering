@@ -1,5 +1,5 @@
 """
-DLT transformation for joining weather data with taxi trips.
+Declarative pipeline transformation for joining weather data with taxi trips.
 
 This table creates the silver layer by combining taxi trip data
 with weather conditions at the time of pickup.
@@ -13,11 +13,11 @@ from pyspark.sql import functions as F
     comment="Taxi trips enriched with weather conditions at pickup time",
     table_properties={
         "quality": "silver",
-        "pipelines.autoOptimize.zOrderCols": "pickup_datetime",
+        "pipelines.autoOptimize.zOrderCols": "tpep_pickup_datetime",
     },
 )
-@dp.expect_or_fail("valid_pickup_datetime", "pickup_datetime IS NOT NULL")
-@dp.expect_or_fail("valid_fare", "fare_amount >= 0")
+@dp.expect_or_fail("valid_pickup_datetime", "tpep_pickup_datetime IS NOT NULL")
+@dp.expect_or_drop("valid_fare", "fare_amount >= 0")
 @dp.expect("has_weather_data", "temperature_2m IS NOT NULL")
 @dp.expect("reasonable_temp", "temperature_2m BETWEEN -50 AND 50")
 def taxi_weather_joined():
@@ -41,9 +41,9 @@ def taxi_weather_joined():
 
     # Create join key: date + hour
     trips_with_key = trips.withColumn(
-        "pickup_date", F.to_date("pickup_datetime")
+        "pickup_date", F.to_date("tpep_pickup_datetime")
     ).withColumn(
-        "pickup_hour", F.hour("pickup_datetime")
+        "pickup_hour", F.hour("tpep_pickup_datetime")
     )
 
     weather_with_key = weather.select(
@@ -72,8 +72,8 @@ def taxi_weather_joined():
     # Select final columns
     return joined.select(
         # Trip columns
-        "pickup_datetime",
-        "dropoff_datetime",
+        "tpep_pickup_datetime",
+        "tpep_dropoff_datetime",
         "pickup_zip",
         "dropoff_zip",
         "trip_distance",

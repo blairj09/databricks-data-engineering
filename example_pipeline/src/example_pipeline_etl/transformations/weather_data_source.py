@@ -1,5 +1,5 @@
 """
-DLT transformation for ingesting weather data.
+Declarative pipeline transformation for ingesting weather data.
 
 This table serves as the bronze/raw layer for weather data,
 fetching historical weather from the Open-Meteo API.

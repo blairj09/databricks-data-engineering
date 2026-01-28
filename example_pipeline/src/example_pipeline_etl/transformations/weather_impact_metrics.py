@@ -1,5 +1,5 @@
 """
-DLT transformation for weather impact analysis metrics.
+Declarative pipeline transformation for weather impact analysis metrics.
 
 This table creates the gold layer with aggregated metrics
 showing how weather conditions affect taxi operations.

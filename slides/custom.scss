@@ -27,3 +27,38 @@ $code-block-bg: #f8f9fa;
   font-size: 1.2em;
   line-height: 1.4;
 }
+
+// White logo for dark background slides
+// reveal.js applies has-dark-background class to .reveal when slide has dark bg
+.reveal.has-dark-background .slide-logo {
+  content: url('../../../../../img/posit-logo-white.svg');
+}
+
+// Agenda navigation slides
+.agenda-nav {
+  text-align: left;
+  padding-left: 2em;
+
+  p {
+    margin: 0.6em 0;
+    font-size: 1.3em;
+    transition: all 0.3s ease;
+  }
+
+  // Faded items (not current section)
+  .faded {
+    color: rgba(255, 255, 255, 0.35);
+    font-weight: normal;
+  }
+
+  // Active/current section
+  .active {
+    color: #ffffff;
+    font-weight: bold;
+  }
+}
+
+// Dark slide text should be white by default
+.reveal.has-dark-background section {
+  color: #ffffff;
+}

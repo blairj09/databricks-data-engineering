@@ -8,7 +8,7 @@ This repository accompanies a webinar that highlights:
 
 1. **Positron** as a professional IDE for data work (vs notebook-centric development)
 2. **Databricks Asset Bundles (DABs)** for infrastructure-as-code deployments
-3. **Delta Live Tables (DLT)** for declarative pipeline development
+3. **Lakeflow Declarative Pipelines** for declarative pipeline development
 4. **AI-assisted development** with Positron Assistant
 
 ## The Use Case
@@ -32,7 +32,7 @@ We build a data pipeline that:
 │   │   ├── example_pipeline/         # Python modules
 │   │   │   ├── weather.py           # Open-Meteo API client
 │   │   │   └── weather_cli.py       # CLI for weather fetch job
-│   │   └── example_pipeline_etl/    # DLT transformations
+│   │   └── example_pipeline_etl/    # Declarative pipeline transformations
 │   │       └── transformations/
 │   │           ├── weather_data_source.py    # Bronze: raw weather
 │   │           ├── weather_taxi_join.py      # Silver: enriched trips
@@ -55,7 +55,7 @@ We build a data pipeline that:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/posit/databricks-data-engineering.git
+   git clone https://github.com/blairj09/databricks-data-engineering.git
    cd databricks-data-engineering
    ```
 
@@ -101,7 +101,7 @@ quarto preview webinar.qmd
 | Copy-paste code | Proper imports and shared modules |
 | Production debugging | Breakpoints and stack traces |
 
-### Delta Live Tables (DLT)
+### Lakeflow Declarative Pipelines
 
 Declarative pipeline definitions with built-in:
 - Dependency management
@@ -120,7 +120,7 @@ Infrastructure-as-code for Databricks:
 
 - [Positron](https://positron.posit.co/)
 - [Databricks Asset Bundles](https://docs.databricks.com/dev-tools/bundles/)
-- [Delta Live Tables](https://docs.databricks.com/delta-live-tables/)
+- [Lakeflow Declarative Pipelines](https://docs.databricks.com/aws/en/ldp/)
 - [Open-Meteo API](https://open-meteo.com/)
 
 ## License

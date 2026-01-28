@@ -27,8 +27,8 @@ def main():
     spark = DatabricksSession.builder.getOrCreate()
 
     # Set catalog and schema
-    spark.sql(f"USE CATALOG {args.catalog}")
-    spark.sql(f"USE SCHEMA {args.schema}")
+    spark.sql(f"USE CATALOG `{args.catalog}`")
+    spark.sql(f"USE SCHEMA `{args.schema}`")
 
     print(f"Fetching weather data from {args.start_date} to {args.end_date}")
 
@@ -47,7 +47,7 @@ def main():
     spark_df = spark.createDataFrame(weather_df)
 
     # Write to Delta table
-    full_table_name = f"{args.catalog}.{args.schema}.{args.table_name}"
+    full_table_name = f"`{args.catalog}`.`{args.schema}`.`{args.table_name}`"
     print(f"Writing to {full_table_name}")
 
     spark_df.write.format("delta").mode("overwrite").saveAsTable(full_table_name)

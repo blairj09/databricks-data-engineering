@@ -13,7 +13,7 @@ execute:
 
 **Business Question**: How does weather impact NYC taxi ridership and fares?
 
-This notebook explores integrating weather data with taxi trip data to answer this question. Once we've validated the approach locally, we'll productionize it as a DLT pipeline in Databricks.
+This notebook explores integrating weather data with taxi trip data to answer this question. Once we've validated the approach locally, we'll productionize it as a Lakeflow Declarative Pipeline in Databricks.
 
 ## Setup
 
@@ -205,10 +205,10 @@ To turn this into a production pipeline, we need:
 
 ---
 
-**Next Step**: Ask Positron Assistant to help create a DLT pipeline based on this exploration.
+**Next Step**: Ask Positron Assistant to help create a declarative pipeline based on this exploration.
 
 Example prompt:
-> "Based on this exploration notebook, help me create a DLT pipeline that:
+> "Based on this exploration notebook, help me create a declarative pipeline that:
 > 1. Ingests weather data into a bronze table
 > 2. Joins it with taxi trips in a silver table
 > 3. Creates gold aggregation tables for analysis

@@ -1,1 +1,8 @@
 WALKTHROUGH.md
+
+# Experimental directories
+cleanroom/
+
+# EDA environment (track notebook, ignore venv and credentials)
+eda/.venv/
+eda/.env

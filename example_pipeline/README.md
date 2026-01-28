@@ -17,12 +17,12 @@ This pipeline:
   * `weather.py` - Open-Meteo API client for fetching weather data
   * `weather_cli.py` - CLI entry point for the weather fetch job
   * `taxis.py` - Taxi data utilities
-* `src/example_pipeline_etl/transformations/`: Delta Live Tables transformations
+* `src/example_pipeline_etl/transformations/`: Lakeflow Declarative Pipelines transformations
   * `weather_data_source.py` - Bronze layer: raw weather data
   * `weather_taxi_join.py` - Silver layer: trips enriched with weather
   * `weather_impact_metrics.py` - Gold layer: aggregated analytics
 * `resources/`: Databricks Asset Bundle configurations
-  * `example_pipeline_etl.pipeline.yml` - DLT pipeline definition
+  * `example_pipeline_etl.pipeline.yml` - Declarative pipeline definition
   * `weather_integration.job.yml` - Job to orchestrate weather fetch + pipeline
 * `tests/`: Unit tests with Databricks Connect
 * `fixtures/`: Sample data for testing
@@ -67,14 +67,14 @@ with this project. It's also possible to interact with it directly using the CLI
     This deploys everything that's defined for this project.
     For example, the default template would deploy a pipeline called
     `[dev yourname] example_pipeline_etl` to your workspace.
-    You can find that resource by opening your workpace and clicking on **Jobs & Pipelines**.
+    You can find that resource by opening your workspace and clicking on **Jobs & Pipelines**.
 
 3. Similarly, to deploy a production copy, type:
    ```
    $ databricks bundle deploy --target prod
    ```
-   Note the default template has a includes a job that runs the pipeline every day
-   (defined in resources/sample_job.job.yml). The schedule
+   Note this includes a job that runs the weather integration pipeline daily
+   (defined in resources/weather_integration.job.yml). The schedule
    is paused when deploying in development mode (see
    https://docs.databricks.com/dev-tools/bundles/deployment-modes.html).
 

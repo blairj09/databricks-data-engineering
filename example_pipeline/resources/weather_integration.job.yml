@@ -1,5 +1,5 @@
 # Job for weather data integration pipeline
-# This job orchestrates the weather data fetch and DLT pipeline refresh
+# This job orchestrates the weather data fetch and declarative pipeline refresh
 
 resources:
   jobs:
@@ -18,9 +18,9 @@ resources:
         - name: schema
           default: ${var.schema}
         - name: start_date
-          default: "2023-01-01"
+          default: "2016-01-01"
         - name: end_date
-          default: "2023-12-31"
+          default: "2016-06-30"
 
       tasks:
         # Task 1: Fetch weather data from Open-Meteo API
@@ -34,11 +34,11 @@ resources:
               start_date: "{{job.parameters.start_date}}"
               end_date: "{{job.parameters.end_date}}"
 
-        # Task 2: Run the DLT pipeline to process weather + taxi data
-        - task_key: run_dlt_pipeline
+        # Task 2: Run the declarative pipeline to process weather + taxi data
+        - task_key: run_declarative_pipeline
           depends_on:
             - task_key: fetch_weather_data
-          description: "Run DLT pipeline to join weather with taxi data"
+          description: "Run declarative pipeline to join weather with taxi data"
           pipeline_task:
             pipeline_id: ${resources.pipelines.example_pipeline_etl.id}
             full_refresh: false
